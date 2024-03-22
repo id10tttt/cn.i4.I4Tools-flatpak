@@ -47,7 +47,7 @@ jobs:
         with:
           name: ${{ steps.date.outputs.CURRENT_DATE }}
           tag_name: ${{ steps.date.outputs.CURRENT_DATE }}
-          files: cn.i4.I4Tools
+          files: cn.i4.I4Tools.flatpak
           body:
             |
             install via:
