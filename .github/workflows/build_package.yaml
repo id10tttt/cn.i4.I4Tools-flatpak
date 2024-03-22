@@ -1,6 +1,11 @@
 name: Build Flatpak Bundle
 on:
   workflow_dispatch:
+    inputs:
+      version:
+        description: 'version'
+        required: true
+        default: 'v1.0.055'
   pull_request:
 
 jobs:
