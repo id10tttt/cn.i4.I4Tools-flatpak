@@ -1,0 +1,413 @@
+id: cn.i4.I4Tools
+runtime: org.freedesktop.Platform
+runtime-version: '23.08'
+sdk: org.freedesktop.Sdk
+command: i4tools
+separate-locales: false
+
+finish-args:
+  - --share=ipc
+  - --share=network
+  - --socket=x11
+  - --socket=pulseaudio
+  - --device=all
+  # System tray icon
+  - --talk-name=org.freedesktop.Notifications
+  - --talk-name=org.kde.StatusNotifierWatcher
+  - --own-name=org.kde.*
+
+  - --talk-name=org.freedesktop.DBus
+  - --talk-name=org.freedesktop.DBus.Proprieties
+  - --system-talk-name=org.freedesktop.DBus
+  - --system-talk-name=org.freedesktop.DBus.Proprieties
+  # Screenshot
+  # - --talk-name=org.gnome.Shell.Screenshot
+  # - --talk-name=org.kde.kwin.Screenshot
+  # Files
+  - --filesystem=xdg-download
+  - --filesystem=xdg-run/pipewire-0
+  - --filesystem=/tmp
+  # IME
+  # - --env=QT_IM_MODULE=
+  # Hidpi scale
+  - --env=QT_AUTO_SCREEN_SCALE_FACTOR=1
+  # Fix `Could not find the Qt platform plugin "wayland"`
+  - --unset-env=QT_QPA_PLATFORM
+
+cleanup:
+  - "/include"
+  - "/lib/pkgconfig"
+  - "/man"
+  - "/share/doc"
+  - "/share/gtk-doc"
+  - "/share/man"
+  - "/share/pkgconfig"
+  - "*.la"
+  - "*.a"
+
+modules:
+  - name: i4tools-deb
+    buildsystem: simple
+    build-commands:
+      - bsdtar --to-stdout -xf i4tools.deb data.* | bsdtar -xf -
+      - mv usr/share/* .
+      - mkdir -p $FLATPAK_DEST/i4tools
+      - cp -r i4tools/* $FLATPAK_DEST/i4tools
+    sources:
+      - type: file
+        url: https://d-app6.i4.cn/i4tools/i4linux/i4tools_v1.0.055.deb
+        sha256: 0f3b65cd3ae69bf98e8443d29f2f27497d81f8f6bacd25a8ca16e96846d75b26
+        dest-filename: i4tools.deb
+
+  - name: i4tools
+    buildsystem: simple
+    build-commands:
+      - install -D i4toolslinux.sh $FLATPAK_DEST/i4tools/i4toolslinux.sh
+      - install -D i4tools.sh $FLATPAK_DEST/bin/i4tools
+      - install -D dde-file-manager.sh $FLATPAK_DEST/bin/dde-file-manager
+      - install -Dm644 cn.i4.I4Tools.metainfo.xml -t $FLATPAK_DEST/share/metainfo
+      - install -Dm644 cn.i4.I4Tools.png -t $FLATPAK_DEST/share/icons/hicolor/256x256/apps
+      - install -Dm644 cn.i4.I4Tools.desktop -t $FLATPAK_DEST/share/applications
+    sources:
+      - type: script
+        dest-filename: i4tools.sh
+        commands:
+          - |
+            exec /app/i4tools/i4toolslinux.sh "$@"
+
+      - type: script
+        dest-filename: dde-file-manager.sh
+        commands:
+          - |
+            if [ "$1" == "--show-item" ]; then
+              real_path=$(realpath -m "$2" | xargs dirname | sed "s:^$HOME/xi4tools_files/:$HOME/.var/app/$FLATPAK_ID/xi4tools_files/:")
+              echo "real path is $real_path"
+              if [ -d "$real_path" ]; then
+                exec xdg-open "$real_path"
+              else
+                zenity --error --text="Path $real_path not found" --icon-name=cn.i4.I4Tools
+              fi
+            fi
+
+      - type: file
+        path: cn.i4.I4Tools.metainfo.xml
+
+      - type: file
+        path: cn.i4.I4Tools.png
+
+      - type: file
+        path: cn.i4.I4Tools.desktop
+
+      - type: file
+        path: i4toolslinux.sh
+
+  - name: libgssapi-krb5-2-deb
+    buildsystem: simple
+    build-commands:
+      - bsdtar --to-stdout -xf libgssapi-krb5-2_1.20.1-2+deb12u1_amd64.deb data.* | bsdtar -xf -
+      - mkdir -p $FLATPAK_DEST/lib/x86_64-linux-gnu
+      - install -Dm644 usr/lib/x86_64-linux-gnu/* -t $FLATPAK_DEST/lib/x86_64-linux-gnu
+    sources:
+      - type: file
+        url: http://ftp.cn.debian.org/debian/pool/main/k/krb5/libgssapi-krb5-2_1.20.1-2+deb12u1_amd64.deb
+        sha256: 6631304ce4b5b9ba0af3fdebf088a734aed2d28ffad2a03ba79e4fcb2e226dd6
+        dest-filename: libgssapi-krb5-2_1.20.1-2+deb12u1_amd64.deb
+
+  - name: librtmp1-deb
+    buildsystem: simple
+    build-commands:
+      - bsdtar --to-stdout -xf librtmp1_2.4+20151223.gitfa8646d.1-2_amd64.deb data.* | bsdtar -xf -
+      - install -Dm644 usr/lib/x86_64-linux-gnu/* -t $FLATPAK_DEST/lib/x86_64-linux-gnu
+    sources:
+      - type: file
+        url: http://ftp.cn.debian.org/debian/pool/main/r/rtmpdump/librtmp1_2.4+20151223.gitfa8646d.1-2_amd64.deb
+        sha256: 506fc9e1fc66f34e6f3f79555619cc12a15388c3bdd5387c1e89d78b19d1b5dc
+        dest-filename: librtmp1_2.4+20151223.gitfa8646d.1-2_amd64.deb
+  
+  - name: libldap-deb
+    buildsystem: simple
+    build-commands:
+      - bsdtar --to-stdout -xf libldap-2.4-2_2.4.57+dfsg-3+deb11u1_amd64.deb data.* | bsdtar -xf -
+      - install -Dm644 usr/lib/x86_64-linux-gnu/* -t $FLATPAK_DEST/lib/x86_64-linux-gnu
+    sources:
+      - type: file
+        url: http://ftp.cn.debian.org/debian/pool/main/o/openldap/libldap-2.4-2_2.4.57+dfsg-3+deb11u1_amd64.deb
+        sha256: 3d79ee84c42c1d1b58a6e0d7debc7e3c8444147b84412b8248a7789809bc3163
+        dest-filename: libldap-2.4-2_2.4.57+dfsg-3+deb11u1_amd64.deb
+
+  - name: libwebp-deb
+    buildsystem: simple
+    build-commands:
+      - bsdtar --to-stdout -xf libwebp6_0.6.1-2+deb10u1_amd64.deb data.* | bsdtar -xf -
+      - install -Dm644 usr/lib/x86_64-linux-gnu/* -t $FLATPAK_DEST/lib/x86_64-linux-gnu
+      - ln -s $FLATPAK_DEST/lib/x86_64-linux-gnu/libwebp.so.6.0.2 $FLATPAK_DEST/lib/x86_64-linux-gnu/libwebp.so
+    sources:
+      - type: file
+        url: http://ftp.de.debian.org/debian/pool/main/libw/libwebp/libwebp6_0.6.1-2+deb10u1_amd64.deb
+        sha256: f4d8e88f87f41530bbe8ad45f60ab87e313ef1ebc9035f9ff24649fc9dd746a9
+        dest-filename: libwebp6_0.6.1-2+deb10u1_amd64.deb
+
+  - name: libtwolame0_0.3.13-deb
+    buildsystem: simple
+    build-commands:
+      - bsdtar --to-stdout -xf libtwolame0_0.3.13-4_amd64.deb data.* | bsdtar -xf -
+      - install -Dm644 usr/lib/x86_64-linux-gnu/* -t $FLATPAK_DEST/lib/x86_64-linux-gnu
+    sources:
+      - type: file
+        url: http://ftp.cn.debian.org/debian/pool/main/t/twolame/libtwolame0_0.3.13-4_amd64.deb
+        sha256: b22893a3a1fa5a98b75405efb27ca07f96454d9ac16cccc91160ea67a0c18102
+        dest-filename: libtwolame0_0.3.13-4_amd64.deb
+
+  - name: libbz2-1.0_1.0.8-deb
+    buildsystem: simple
+    build-commands:
+      - bsdtar --to-stdout -xf libbz2-1.0_1.0.8-5+b1_amd64.deb data.* | bsdtar -xf -
+      - install -Dm644 lib/x86_64-linux-gnu/* -t $FLATPAK_DEST/lib/x86_64-linux-gnu
+    sources:
+      - type: file
+        url: http://ftp.cn.debian.org/debian/pool/main/b/bzip2/libbz2-1.0_1.0.8-5+b1_amd64.deb
+        sha256: 54149da3f44b22d523b26b692033b84503d822cc5122fed606ea69cc83ca5aeb
+        dest-filename: libbz2-1.0_1.0.8-5+b1_amd64.deb
+  
+  - name: libcdio-paranoia2-deb
+    buildsystem: simple
+    build-commands:
+      - bsdtar --to-stdout -xf libcdio-paranoia2_10.2+0.94+2-4_amd64.deb data.* | bsdtar -xf -
+      - install -Dm644 usr/lib/x86_64-linux-gnu/* -t $FLATPAK_DEST/lib/x86_64-linux-gnu
+    sources:
+      - type: file
+        url: http://ftp.cn.debian.org/debian/pool/main/libc/libcdio-paranoia/libcdio-paranoia2_10.2+0.94+2-4_amd64.deb
+        sha256: 1140c12bd144932351a9d2bd03aef998c010164cbcb8546aee472e7e2c27e69b
+        dest-filename: libcdio-paranoia2_10.2+0.94+2-4_amd64.deb
+
+  - name: libcdio-cdda2_10.2-deb
+    buildsystem: simple
+    build-commands:
+      - bsdtar --to-stdout -xf libcdio-cdda2_10.2+0.94+2-4_amd64.deb data.* | bsdtar -xf -
+      - install -Dm644 usr/lib/x86_64-linux-gnu/* -t $FLATPAK_DEST/lib/x86_64-linux-gnu
+    sources:
+      - type: file
+        url: http://ftp.cn.debian.org/debian/pool/main/libc/libcdio-paranoia/libcdio-cdda2_10.2+0.94+2-4_amd64.deb
+        sha256: 44ccc3c3c8700c9f2bbaef88d6bface1c547bf8dceaddd8ecce04a6ab92c3b68
+        dest-filename: libcdio-cdda2_10.2+0.94+2-4_amd64.deb
+  
+  - name: libcaca0_0.99-deb
+    buildsystem: simple
+    build-commands:
+      - bsdtar --to-stdout -xf libcaca0_0.99.beta20-3_amd64.deb data.* | bsdtar -xf -
+      - cp -r usr/lib/x86_64-linux-gnu/* $FLATPAK_DEST/lib/x86_64-linux-gnu
+    sources:
+      - type: file
+        url: http://ftp.cn.debian.org/debian/pool/main/libc/libcaca/libcaca0_0.99.beta20-3_amd64.deb
+        sha256: c46d3b3d4441b5b0c45d4dfb152a2ed230923c5b5bd125d8124ead46423d286d
+        dest-filename: libcaca0_0.99.beta20-3_amd64.deb
+
+  - name: libavc1394-0_0.5.4-5-deb
+    buildsystem: simple
+    build-commands:
+      - bsdtar --to-stdout -xf libraw1394-11_2.1.2-2_amd64.deb data.* | bsdtar -xf -
+      - install -Dm644 usr/lib/x86_64-linux-gnu/* -t $FLATPAK_DEST/lib/x86_64-linux-gnu
+    sources:
+      - type: file
+        url: http://ftp.cn.debian.org/debian/pool/main/libr/libraw1394/libraw1394-11_2.1.2-2_amd64.deb
+        sha256: d8cb92f085d3b32ca23e31b2bf45f66d678f585fef8f8b85510bd41b8ff966ee
+        dest-filename: libraw1394-11_2.1.2-2_amd64.deb
+
+  - name: libavc1394-0_0.5.4-5-deb
+    buildsystem: simple
+    build-commands:
+      - bsdtar --to-stdout -xf libavc1394-0_0.5.4-5_amd64.deb data.* | bsdtar -xf -
+      - install -Dm644 usr/lib/x86_64-linux-gnu/* -t $FLATPAK_DEST/lib/x86_64-linux-gnu
+    sources:
+      - type: file
+        url: http://ftp.cn.debian.org/debian/pool/main/liba/libavc1394/libavc1394-0_0.5.4-5_amd64.deb
+        sha256: f96e824b1a7e8d9ae1254c51dfaea40cdde45072be68e2025eb109faba10f3dc
+        dest-filename: libavc1394-0_0.5.4-5_amd64.deb
+  
+  - name: libiec61883-0_1.2.0-6-deb
+    buildsystem: simple
+    build-commands:
+      - bsdtar --to-stdout -xf libiec61883-0_1.2.0-6+b1_amd64.deb data.* | bsdtar -xf -
+      - install -Dm644 usr/lib/x86_64-linux-gnu/* -t $FLATPAK_DEST/lib/x86_64-linux-gnu
+    sources:
+      - type: file
+        url: http://ftp.cn.debian.org/debian/pool/main/libi/libiec61883/libiec61883-0_1.2.0-6+b1_amd64.deb
+        sha256: 98d5901dc67a2df54ddfe8d417b0e2a9e47278b7614339f7522ef0b2bd709444
+        dest-filename: libiec61883-0_1.2.0-6+b1_amd64.deb
+  
+  - name: libnuma1_2.0.16-1-deb
+    buildsystem: simple
+    build-commands:
+      - bsdtar --to-stdout -xf libnuma1_2.0.16-1_amd64.deb data.* | bsdtar -xf -
+      - install -Dm644 usr/lib/x86_64-linux-gnu/* -t $FLATPAK_DEST/lib/x86_64-linux-gnu
+    sources:
+      - type: file
+        url: http://ftp.cn.debian.org/debian/pool/main/n/numactl/libnuma1_2.0.16-1_amd64.deb
+        sha256: 639e1ab6bd66ead40db8a22c332d7199679fa22db261cac34444eb8eb4c17dda
+        dest-filename: libnuma1_2.0.16-1_amd64.deb
+  
+  - name: libkrb5-3_1.18.3-6-deb
+    buildsystem: simple
+    build-commands:
+      - bsdtar --to-stdout -xf libkrb5-3_1.18.3-6+deb11u4_amd64.deb data.* | bsdtar -xf -
+      - cp -r usr/lib/x86_64-linux-gnu/* -t $FLATPAK_DEST/lib/x86_64-linux-gnu
+    sources:
+      - type: file
+        url: http://ftp.cn.debian.org/debian/pool/main/k/krb5/libkrb5-3_1.18.3-6+deb11u4_amd64.deb
+        sha256: b785fa324cf27e6bf7f97fc0279470e6ce8a8cc54f8ccc6c9b24c8111ba5c952
+        dest-filename: libkrb5-3_1.18.3-6+deb11u4_amd64.deb
+
+  - name: libk5crypto3_1.18.3-6-deb
+    buildsystem: simple
+    build-commands:
+      - bsdtar --to-stdout -xf libk5crypto3_1.18.3-6+deb11u4_amd64.deb data.* | bsdtar -xf -
+      - install -Dm644 usr/lib/x86_64-linux-gnu/* -t $FLATPAK_DEST/lib/x86_64-linux-gnu
+    sources:
+      - type: file
+        url: http://ftp.cn.debian.org/debian/pool/main/k/krb5/libk5crypto3_1.18.3-6+deb11u4_amd64.deb
+        sha256: f635062bcbfe2eef5a83fcba7d1a8ae343fc7c779cae88b11cae90fd6845a744
+        dest-filename: libk5crypto3_1.18.3-6+deb11u4_amd64.deb
+  
+  - name: libkrb5support0-deb
+    buildsystem: simple
+    build-commands:
+      - bsdtar --to-stdout -xf libkrb5support0_1.18.3-6+deb11u4_amd64.deb data.* | bsdtar -xf -
+      - install -Dm644 usr/lib/x86_64-linux-gnu/* -t $FLATPAK_DEST/lib/x86_64-linux-gnu
+    sources:
+      - type: file
+        url: http://ftp.cn.debian.org/debian/pool/main/k/krb5/libkrb5support0_1.18.3-6+deb11u4_amd64.deb
+        sha256: da8d022e3dd7f4a72ea32e328b3ac382dbe6bdb91606c5738fe17a29f8ea8080
+        dest-filename: libkrb5support0_1.18.3-6+deb11u4_amd64.deb
+  
+  - name: libhogweed4_3.4.1-1-deb
+    buildsystem: simple
+    build-commands:
+      - bsdtar --to-stdout -xf libhogweed4_3.4.1-1+deb10u1_amd64.deb data.* | bsdtar -xf -
+      - install -Dm644 usr/lib/x86_64-linux-gnu/* -t $FLATPAK_DEST/lib/x86_64-linux-gnu
+    sources:
+      - type: file
+        url: http://ftp.cn.debian.org/debian/pool/main/n/nettle/libhogweed4_3.4.1-1+deb10u1_amd64.deb
+        sha256: e57c058cfd9b6622dd595be4ee94e2aed595be8cbc8d0623db5fb4595f09cdd5
+        dest-filename: libhogweed4_3.4.1-1+deb10u1_amd64.deb
+  
+  - name: libnettle8-deb
+    buildsystem: simple
+    build-commands:
+      - bsdtar --to-stdout -xf libnettle8_3.8.1-2_amd64.deb data.* | bsdtar -xf -
+      - install -Dm644 usr/lib/x86_64-linux-gnu/* -t $FLATPAK_DEST/lib/x86_64-linux-gnu
+    sources:
+      - type: file
+        url: http://ftp.cn.debian.org/debian/pool/main/n/nettle/libnettle8_3.8.1-2_amd64.deb
+        sha256: 45922e6e289ffd92f0f92d2bb9159e84236ff202d552a461bf10e5335b3f0261
+        dest-filename: libnettle8_3.8.1-2_amd64.deb
+  
+  - name: libnettle6-deb
+    buildsystem: simple
+    build-commands:
+      - bsdtar --to-stdout -xf libnettle6_3.4.1-1+deb10u1_amd64.deb data.* | bsdtar -xf -
+      - install -Dm644 usr/lib/x86_64-linux-gnu/* -t $FLATPAK_DEST/lib/x86_64-linux-gnu
+    sources:
+      - type: file
+        url: http://ftp.cn.debian.org/debian/pool/main/n/nettle/libnettle6_3.4.1-1+deb10u1_amd64.deb
+        sha256: e7139151367e9ee82bb7c1664ce5793f8aa9310492604726d0f535f969394bdf
+        dest-filename: libnettle6_3.4.1-1+deb10u1_amd64.deb
+  
+  - name: libsasl2-2_2.1.27-deb
+    buildsystem: simple
+    build-commands:
+      - bsdtar --to-stdout -xf libsasl2-2_2.1.27+dfsg-2.1+deb11u1_amd64.deb data.* | bsdtar -xf -
+      - install -Dm644 usr/lib/x86_64-linux-gnu/* -t $FLATPAK_DEST/lib/x86_64-linux-gnu
+    sources:
+      - type: file
+        url: http://ftp.cn.debian.org/debian/pool/main/c/cyrus-sasl2/libsasl2-2_2.1.27+dfsg-2.1+deb11u1_amd64.deb
+        sha256: 2e86ab7a3329aad4b7350a9b067fe8f80b680302f2f82d94f73f9bf075404460
+        dest-filename: libsasl2-2_2.1.27+dfsg-2.1+deb11u1_amd64.deb
+  
+  - name: libsodium23_1.0.18-deb
+    buildsystem: simple
+    build-commands:
+      - bsdtar --to-stdout -xf libsodium23_1.0.18-1_amd64.deb data.* | bsdtar -xf -
+      - install -Dm644 usr/lib/x86_64-linux-gnu/* -t $FLATPAK_DEST/lib/x86_64-linux-gnu
+    sources:
+      - type: file
+        url: http://ftp.cn.debian.org/debian/pool/main/libs/libsodium/libsodium23_1.0.18-1_amd64.deb
+        sha256: f72e5b1e3a716154c284d98969bb698701daa30b02d755a78d10d460c582d48b
+        dest-filename: libsodium23_1.0.18-1_amd64.deb
+  
+  - name: libcdio18-deb
+    buildsystem: simple
+    build-commands:
+      - bsdtar --to-stdout -xf libcdio18_2.0.0-2_amd64.deb data.* | bsdtar -xf -
+      - install -Dm644 usr/lib/x86_64-linux-gnu/* -t $FLATPAK_DEST/lib/x86_64-linux-gnu
+    sources:
+      - type: file
+        url: http://ftp.cn.debian.org/debian/pool/main/libc/libcdio/libcdio18_2.0.0-2_amd64.deb
+        sha256: caafbabaffef90d57250196e26357070fcc739387f41f5d9b8d7340696438157
+        dest-filename: libcdio18_2.0.0-2_amd64.deb
+  
+  - name: libbsd0_0.11.3-deb
+    buildsystem: simple
+    build-commands:
+      - bsdtar --to-stdout -xf libbsd0_0.11.3-1+deb11u1_amd64.deb data.* | bsdtar -xf -
+      - install -Dm644 usr/lib/x86_64-linux-gnu/* -t $FLATPAK_DEST/lib/x86_64-linux-gnu
+    sources:
+      - type: file
+        url: http://ftp.cn.debian.org/debian/pool/main/libb/libbsd/libbsd0_0.11.3-1+deb11u1_amd64.deb
+        sha256: 6ec5a08a4bb32c0dc316617f4bbefa8654c472d1cd4412ab8995f3955491f4a8
+        dest-filename: libbsd0_0.11.3-1+deb11u1_amd64.deb
+  
+  - name: libslang2_2.3.2-deb
+    buildsystem: simple
+    build-commands:
+      - bsdtar --to-stdout -xf libslang2_2.3.2-2_amd64.deb data.* | bsdtar -xf -
+      - install -Dm644 lib/x86_64-linux-gnu/* -t $FLATPAK_DEST/lib/x86_64-linux-gnu
+    sources:
+      - type: file
+        url: http://ftp.cn.debian.org/debian/pool/main/s/slang2/libslang2_2.3.2-2_amd64.deb
+        sha256: d94c51ea5cdf253019b67867bf4b0a5116ab224e97fd767614f0af31c63477bd
+        dest-filename: libslang2_2.3.2-2_amd64.deb
+  
+  - name: libkeyutils1_1.6-deb
+    buildsystem: simple
+    build-commands:
+      - bsdtar --to-stdout -xf libkeyutils1_1.6-6_amd64.deb data.* | bsdtar -xf -
+      - install -Dm644 lib/x86_64-linux-gnu/* -t $FLATPAK_DEST/lib/x86_64-linux-gnu
+    sources:
+      - type: file
+        url: http://ftp.cn.debian.org/debian/pool/main/k/keyutils/libkeyutils1_1.6-6_amd64.deb
+        sha256: 0c199af9431db289ba5b34a4f21e30a4f1b6c5305203da9298096fce1cdcdb97
+        dest-filename: libkeyutils1_1.6-6_amd64.deb
+  
+  - name: libmd0_1-deb
+    buildsystem: simple
+    build-commands:
+      - bsdtar --to-stdout -xf libmd0_1.1.0-2_amd64.deb data.* | bsdtar -xf -
+      - install -Dm644 usr/lib/x86_64-linux-gnu/* -t $FLATPAK_DEST/lib/x86_64-linux-gnu
+    sources:
+      - type: file
+        url: http://ftp.cn.debian.org/debian/pool/main/libm/libmd/libmd0_1.1.0-2_amd64.deb
+        sha256: e6d2f7be9ad32d9acad95d01a42f3b451494229bd122d73767f5bbe818a057c5
+        dest-filename: libmd0_1.1.0-2_amd64.deb
+  
+  - name: libtinfo6-udeb_6.2+20201114-deb
+    buildsystem: simple
+    build-commands:
+      - bsdtar --to-stdout -xf libtinfo6-udeb_6.2+20201114-2+deb11u2_amd64.udeb data.* | bsdtar -xf -
+      - install -Dm644 usr/lib/x86_64-linux-gnu/* -t $FLATPAK_DEST/lib/x86_64-linux-gnu
+    sources:
+      - type: file
+        url: http://ftp.cn.debian.org/debian/pool/main/n/ncurses/libtinfo6-udeb_6.2+20201114-2+deb11u2_amd64.udeb
+        sha256: bfb198f38dd179385fd2e38301e897958db6914d8d6eef64825ce10b99b4d3f0
+        dest-filename: libtinfo6-udeb_6.2+20201114-2+deb11u2_amd64.udeb
+  
+  - name: libncursesw6_6.2+20201114-2+deb11u2-deb
+    buildsystem: simple
+    build-commands:
+      - bsdtar --to-stdout -xf libncursesw6_6.2+20201114-2+deb11u2_amd64.deb data.* | bsdtar -xf -
+      - install -Dm644 usr/lib/x86_64-linux-gnu/* -t $FLATPAK_DEST/lib/x86_64-linux-gnu
+      - install -Dm644 lib/x86_64-linux-gnu/* -t $FLATPAK_DEST/lib/x86_64-linux-gnu
+    sources:
+      - type: file
+        url: http://ftp.cn.debian.org/debian/pool/main/n/ncurses/libncursesw6_6.2+20201114-2+deb11u2_amd64.deb
+        sha256: 70ed9c6f35a9de73a01b042d740d92c46bbc0392ca4e63ee984417bd8a4eca3a
+        dest-filename: libncursesw6_6.2+20201114-2+deb11u2_amd64.deb

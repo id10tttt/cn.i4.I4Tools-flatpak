@@ -1,0 +1,8 @@
+[Desktop Entry]
+Encoding=UTF-8
+Version=1.0
+Type=Application
+Terminal=false
+Exec=sh /app/i4tools/i4toolslinux.sh
+Name=i4tools
+Icon=cn.i4.I4Tools

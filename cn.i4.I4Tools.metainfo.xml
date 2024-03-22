@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>cn.i4.I4Tools</id>
+  <name>i4tool</name>
+  <project_license>LicenseRef-proprietary</project_license>
+  <developer_name>i4</developer_name>
+  <summary>爱思助手电脑端</summary>
+  <summary xml:lang="zh-cn">爱思手机助手</summary>
+  <metadata_license>CC0-1.0</metadata_license>
+  <launchable type="desktop-id">cn.i4.I4Tools.desktop</launchable>
+  <url type="homepage">https://www.i4.cn/</url>
+  <url type="help">https://www.i4.cn/about.html#contact_us</url>
+  <description>
+    <p>爱思手机助手.</p>
+    <p>具有独创的云智能一键刷机功能</p>
+    <p>简单易用的备份恢复，数据迁移等高级工具</p>
+    <p>免帐号高速安装海量的应用和游戏</p>
+    <p>铃声壁纸彩铃等海量个性化资源任你使用</p>
+    <p>NOTE: This wrapper is not verified by, affiliated with, or supported by Alibabainc.</p>
+  </description>
+  <description xml:lang="zh-cn">
+    <p>爱思助手电脑端</p>
+  </description>
+  <categories>
+    <category>InstantMessaging</category>
+    <category>Network</category>
+  </categories>
+  <releases>
+    <release version="v1.0.055" date="2024-03-22"/>
+  </releases>
+  <content_rating type="oars-1.1"/>
+  <update_contact>dgqcjx@gmail.com</update_contact>
+</component>
