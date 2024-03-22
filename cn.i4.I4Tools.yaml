@@ -11,11 +11,12 @@ finish-args:
   - --socket=x11
   - --socket=pulseaudio
   - --device=all
+
   # System tray icon
   - --talk-name=org.freedesktop.Notifications
   - --talk-name=org.kde.StatusNotifierWatcher
   - --own-name=org.kde.*
-
+  
   - --talk-name=org.freedesktop.DBus
   - --talk-name=org.freedesktop.DBus.Proprieties
   - --system-talk-name=org.freedesktop.DBus
@@ -24,16 +25,22 @@ finish-args:
   # - --talk-name=org.gnome.Shell.Screenshot
   # - --talk-name=org.kde.kwin.Screenshot
   # Files
+  - --filesystem=/var/lib/flatpak/app:ro
+  - --system-talk-name=org.freedesktop.UDisks2
   - --filesystem=xdg-download
   - --filesystem=xdg-run/pipewire-0
   - --filesystem=/tmp
+  - --filesystem=host
+  - --filesystem=/run/udev
+  - --filesystem=/run/usbmuxd
+  - --filesystem=/run/usbmuxd.pid
   # IME
   # - --env=QT_IM_MODULE=
   # Hidpi scale
   - --env=QT_AUTO_SCREEN_SCALE_FACTOR=1
   # Fix `Could not find the Qt platform plugin "wayland"`
   - --unset-env=QT_QPA_PLATFORM
-
+  
 cleanup:
   - "/include"
   - "/lib/pkgconfig"
@@ -52,13 +59,20 @@ modules:
       - bsdtar --to-stdout -xf i4tools.deb data.* | bsdtar -xf -
       - mv usr/share/* .
       - mkdir -p $FLATPAK_DEST/i4tools
+      - mkdir -p /run/host/etc/udev/rules.d
+      - mkdir -p $FLATPAK_DEST/etc/udev/rules.d
       - cp -r i4tools/* $FLATPAK_DEST/i4tools
+      - install -Dm644 etc/udev/rules.d/* -t $FLATPAK_DEST/etc/udev/rules.d
+      - install -Dm644 etc/udev/rules.d/* -t /run/host/etc/udev/rules.d
+    config-opts: 
+      - -Db_lto=true
+      - -Dudevrulesdir=$FLATPAK_DEST/etc/udev/rules.d
     sources:
       - type: file
         url: https://d-app6.i4.cn/i4tools/i4linux/i4tools_v1.0.055.deb
         sha256: 0f3b65cd3ae69bf98e8443d29f2f27497d81f8f6bacd25a8ca16e96846d75b26
         dest-filename: i4tools.deb
-
+      
   - name: i4tools
     buildsystem: simple
     build-commands:
@@ -140,12 +154,22 @@ modules:
     build-commands:
       - bsdtar --to-stdout -xf libwebp6_0.6.1-2+deb10u1_amd64.deb data.* | bsdtar -xf -
       - install -Dm644 usr/lib/x86_64-linux-gnu/* -t $FLATPAK_DEST/lib/x86_64-linux-gnu
-      - ln -s $FLATPAK_DEST/lib/x86_64-linux-gnu/libwebp.so.6.0.2 $FLATPAK_DEST/lib/x86_64-linux-gnu/libwebp.so
     sources:
       - type: file
         url: http://ftp.de.debian.org/debian/pool/main/libw/libwebp/libwebp6_0.6.1-2+deb10u1_amd64.deb
         sha256: f4d8e88f87f41530bbe8ad45f60ab87e313ef1ebc9035f9ff24649fc9dd746a9
         dest-filename: libwebp6_0.6.1-2+deb10u1_amd64.deb
+
+  - name: libwebp-dev-deb
+    buildsystem: simple
+    build-commands:
+      - bsdtar --to-stdout -xf libwebp-dev_1.2.4-0.2+deb12u1_amd64.deb data.* | bsdtar -xf -
+      - cp -r usr/lib/x86_64-linux-gnu/* $FLATPAK_DEST/lib/x86_64-linux-gnu
+    sources:
+      - type: file
+        url: http://ftp.cn.debian.org/debian/pool/main/libw/libwebp/libwebp-dev_1.2.4-0.2+deb12u1_amd64.deb
+        sha256: a9d07a8423e462babc947dd5745875a58c450fd5ca5c4493dbabe17387f97d89
+        dest-filename: libwebp-dev_1.2.4-0.2+deb12u1_amd64.deb
 
   - name: libtwolame0_0.3.13-deb
     buildsystem: simple
@@ -279,7 +303,7 @@ modules:
         sha256: da8d022e3dd7f4a72ea32e328b3ac382dbe6bdb91606c5738fe17a29f8ea8080
         dest-filename: libkrb5support0_1.18.3-6+deb11u4_amd64.deb
   
-  - name: libhogweed4_3.4.1-1-deb
+  - name: libhogweed4_3.4.1-deb
     buildsystem: simple
     build-commands:
       - bsdtar --to-stdout -xf libhogweed4_3.4.1-1+deb10u1_amd64.deb data.* | bsdtar -xf -
@@ -289,6 +313,17 @@ modules:
         url: http://ftp.cn.debian.org/debian/pool/main/n/nettle/libhogweed4_3.4.1-1+deb10u1_amd64.deb
         sha256: e57c058cfd9b6622dd595be4ee94e2aed595be8cbc8d0623db5fb4595f09cdd5
         dest-filename: libhogweed4_3.4.1-1+deb10u1_amd64.deb
+
+  - name: libhogweed6_3.8.1-deb
+    buildsystem: simple
+    build-commands:
+      - bsdtar --to-stdout -xf libhogweed6_3.8.1-2_amd64.deb data.* | bsdtar -xf -
+      - install -Dm644 usr/lib/x86_64-linux-gnu/* -t $FLATPAK_DEST/lib/x86_64-linux-gnu
+    sources:
+      - type: file
+        url: http://ftp.cn.debian.org/debian/pool/main/n/nettle/libhogweed6_3.8.1-2_amd64.deb
+        sha256: ed8185c28b2cb519744a5a462dcd720d3b332c9b88a1d0002eac06dc8550cb94
+        dest-filename: libhogweed6_3.8.1-2_amd64.deb
   
   - name: libnettle8-deb
     buildsystem: simple
@@ -411,3 +446,25 @@ modules:
         url: http://ftp.cn.debian.org/debian/pool/main/n/ncurses/libncursesw6_6.2+20201114-2+deb11u2_amd64.deb
         sha256: 70ed9c6f35a9de73a01b042d740d92c46bbc0392ca4e63ee984417bd8a4eca3a
         dest-filename: libncursesw6_6.2+20201114-2+deb11u2_amd64.deb
+  
+  - name: libgnutls30_3.7.1-5+deb11u4_amd64-deb
+    buildsystem: simple
+    build-commands:
+      - bsdtar --to-stdout -xf libgnutls30_3.7.1-5+deb11u4_amd64.deb data.* | bsdtar -xf -
+      - install -Dm644 usr/lib/x86_64-linux-gnu/* -t $FLATPAK_DEST/lib/x86_64-linux-gnu
+    sources:
+      - type: file
+        url: http://ftp.cn.debian.org/debian/pool/main/g/gnutls28/libgnutls30_3.7.1-5+deb11u4_amd64.deb
+        sha256: b2fa128881a16c2196caddb551d3577baa296a7bc5d38109a978e8e69fdb5c94
+        dest-filename: libgnutls30_3.7.1-5+deb11u4_amd64.deb
+  
+  - name: libunistring2_0.9.10-4_amd64-deb
+    buildsystem: simple
+    build-commands:
+      - bsdtar --to-stdout -xf libunistring2_0.9.10-4_amd64.deb data.* | bsdtar -xf -
+      - install -Dm644 usr/lib/x86_64-linux-gnu/* -t $FLATPAK_DEST/lib/x86_64-linux-gnu
+    sources:
+      - type: file
+        url: http://ftp.cn.debian.org/debian/pool/main/libu/libunistring/libunistring2_0.9.10-4_amd64.deb
+        sha256: 654433ad02d3a8b05c1683c6c29a224500bf343039c34dcec4e5e9515345e3d4
+        dest-filename: libunistring2_0.9.10-4_amd64.deb
