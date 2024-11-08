@@ -57,26 +57,27 @@ modules:
     buildsystem: simple
     build-commands:
       - bsdtar --to-stdout -xf i4tools.deb data.* | bsdtar -xf -
+      - ls -al
       - mv usr/share/* .
-      - mkdir -p $FLATPAK_DEST/i4tools
+      - mkdir -p $FLATPAK_DEST/cn.i4Tools
       - mkdir -p /run/host/etc/udev/rules.d
       - mkdir -p $FLATPAK_DEST/etc/udev/rules.d
-      - cp -r i4tools/* $FLATPAK_DEST/i4tools
-      - install -Dm644 etc/udev/rules.d/* -t $FLATPAK_DEST/etc/udev/rules.d
-      - install -Dm644 etc/udev/rules.d/* -t /run/host/etc/udev/rules.d
+      - cp -r opt/apps/cn.i4Tools/* $FLATPAK_DEST/cn.i4Tools
+      # - install -Dm644 etc/udev/rules.d/* -t $FLATPAK_DEST/etc/udev/rules.d
+      # - install -Dm644 etc/udev/rules.d/* -t /run/host/etc/udev/rules.d
     config-opts: 
       - -Db_lto=true
       - -Dudevrulesdir=$FLATPAK_DEST/etc/udev/rules.d
     sources:
       - type: file
-        url: https://d-app6.i4.cn/i4tools/i4linux/i4tools_v1.0.055.deb
-        sha256: 0f3b65cd3ae69bf98e8443d29f2f27497d81f8f6bacd25a8ca16e96846d75b26
+        url: https://d-updater.i4.cn/i4linux/deb/i4tools_v3.06.007.deb
+        sha256: 5cd0fe060d008319c3538e867262e77920d14f918f9834fa864442d1dec5bd5f
         dest-filename: i4tools.deb
       
   - name: i4tools
     buildsystem: simple
     build-commands:
-      - install -D i4toolslinux.sh $FLATPAK_DEST/i4tools/i4toolslinux.sh
+      # - install -D i4toolslinux.sh $FLATPAK_DEST/cn.i4Tools/i4toolslinux.sh
       - install -D i4tools.sh $FLATPAK_DEST/bin/i4tools
       - install -D dde-file-manager.sh $FLATPAK_DEST/bin/dde-file-manager
       - install -Dm644 cn.i4.I4Tools.metainfo.xml -t $FLATPAK_DEST/share/metainfo
@@ -87,7 +88,7 @@ modules:
         dest-filename: i4tools.sh
         commands:
           - |
-            exec /app/i4tools/i4toolslinux.sh "$@"
+            exec /app/cn.i4Tools/run.sh "$@"
 
       - type: script
         dest-filename: dde-file-manager.sh
@@ -118,14 +119,14 @@ modules:
   - name: libgssapi-krb5-2-deb
     buildsystem: simple
     build-commands:
-      - bsdtar --to-stdout -xf libgssapi-krb5-2_1.20.1-2+deb12u1_amd64.deb data.* | bsdtar -xf -
+      - bsdtar --to-stdout -xf libgssapi-krb5-2_1.21.3-3_amd64.deb data.* | bsdtar -xf -
       - mkdir -p $FLATPAK_DEST/lib/x86_64-linux-gnu
       - install -Dm644 usr/lib/x86_64-linux-gnu/* -t $FLATPAK_DEST/lib/x86_64-linux-gnu
     sources:
       - type: file
-        url: http://ftp.cn.debian.org/debian/pool/main/k/krb5/libgssapi-krb5-2_1.20.1-2+deb12u1_amd64.deb
-        sha256: 6631304ce4b5b9ba0af3fdebf088a734aed2d28ffad2a03ba79e4fcb2e226dd6
-        dest-filename: libgssapi-krb5-2_1.20.1-2+deb12u1_amd64.deb
+        url: http://ftp.cn.debian.org/debian/pool/main/k/krb5/libgssapi-krb5-2_1.21.3-3_amd64.deb
+        sha256: c9733cd3aefc2eb1a82a7a6fe569c3608e8d51eb10c97df885b76f47943dcd61
+        dest-filename: libgssapi-krb5-2_1.21.3-3_amd64.deb
 
   - name: librtmp1-deb
     buildsystem: simple
@@ -273,35 +274,35 @@ modules:
   - name: libkrb5-3_1.18.3-6-deb
     buildsystem: simple
     build-commands:
-      - bsdtar --to-stdout -xf libkrb5-3_1.18.3-6+deb11u4_amd64.deb data.* | bsdtar -xf -
+      - bsdtar --to-stdout -xf libkrb5-3_1.18.3-6+deb11u5_amd64.deb data.* | bsdtar -xf -
       - cp -r usr/lib/x86_64-linux-gnu/* -t $FLATPAK_DEST/lib/x86_64-linux-gnu
     sources:
       - type: file
-        url: http://ftp.cn.debian.org/debian/pool/main/k/krb5/libkrb5-3_1.18.3-6+deb11u4_amd64.deb
-        sha256: b785fa324cf27e6bf7f97fc0279470e6ce8a8cc54f8ccc6c9b24c8111ba5c952
-        dest-filename: libkrb5-3_1.18.3-6+deb11u4_amd64.deb
+        url: http://ftp.cn.debian.org/debian/pool/main/k/krb5/libkrb5-3_1.18.3-6+deb11u5_amd64.deb
+        sha256: 198cd5a8616a98464283ab46fce7f86c5bb807a51257881cce81b05cc1f6d5fe
+        dest-filename: libkrb5-3_1.18.3-6+deb11u5_amd64.deb
 
   - name: libk5crypto3_1.18.3-6-deb
     buildsystem: simple
     build-commands:
-      - bsdtar --to-stdout -xf libk5crypto3_1.18.3-6+deb11u4_amd64.deb data.* | bsdtar -xf -
+      - bsdtar --to-stdout -xf libk5crypto3_1.18.3-6+deb11u5_amd64.deb data.* | bsdtar -xf -
       - install -Dm644 usr/lib/x86_64-linux-gnu/* -t $FLATPAK_DEST/lib/x86_64-linux-gnu
     sources:
       - type: file
-        url: http://ftp.cn.debian.org/debian/pool/main/k/krb5/libk5crypto3_1.18.3-6+deb11u4_amd64.deb
-        sha256: f635062bcbfe2eef5a83fcba7d1a8ae343fc7c779cae88b11cae90fd6845a744
-        dest-filename: libk5crypto3_1.18.3-6+deb11u4_amd64.deb
+        url: http://ftp.cn.debian.org/debian/pool/main/k/krb5/libk5crypto3_1.18.3-6+deb11u5_amd64.deb
+        sha256: 51b242c8423244fd661cdc91213aa870998e29d078930f303d5881537ae4f15e
+        dest-filename: libk5crypto3_1.18.3-6+deb11u5_amd64.deb
   
   - name: libkrb5support0-deb
     buildsystem: simple
     build-commands:
-      - bsdtar --to-stdout -xf libkrb5support0_1.18.3-6+deb11u4_amd64.deb data.* | bsdtar -xf -
+      - bsdtar --to-stdout -xf libkrb5support0_1.18.3-6+deb11u5_amd64.deb data.* | bsdtar -xf -
       - install -Dm644 usr/lib/x86_64-linux-gnu/* -t $FLATPAK_DEST/lib/x86_64-linux-gnu
     sources:
       - type: file
-        url: http://ftp.cn.debian.org/debian/pool/main/k/krb5/libkrb5support0_1.18.3-6+deb11u4_amd64.deb
-        sha256: da8d022e3dd7f4a72ea32e328b3ac382dbe6bdb91606c5738fe17a29f8ea8080
-        dest-filename: libkrb5support0_1.18.3-6+deb11u4_amd64.deb
+        url: http://ftp.cn.debian.org/debian/pool/main/k/krb5/libkrb5support0_1.18.3-6+deb11u5_amd64.deb
+        sha256: 5ef1bac55f8e8f0736ee554429c77c2cb7c0d03773d6b60a16b552c185aa490f
+        dest-filename: libkrb5support0_1.18.3-6+deb11u5_amd64.deb
   
   - name: libhogweed4_3.4.1-deb
     buildsystem: simple
@@ -412,17 +413,41 @@ modules:
         url: http://ftp.cn.debian.org/debian/pool/main/k/keyutils/libkeyutils1_1.6-6_amd64.deb
         sha256: 0c199af9431db289ba5b34a4f21e30a4f1b6c5305203da9298096fce1cdcdb97
         dest-filename: libkeyutils1_1.6-6_amd64.deb
-  
-  - name: libmd0_1-deb
+
+  - name: glibc-deb
     buildsystem: simple
     build-commands:
-      - bsdtar --to-stdout -xf libmd0_1.1.0-2_amd64.deb data.* | bsdtar -xf -
+      - bsdtar --to-stdout -xf libc6-amd64_i386.deb  data.* | bsdtar -xf -
+      - mkdir -p $FLATPAK_DEST/lib/glibc-deb/lib64
+      - cp -r usr/lib64/* -t $FLATPAK_DEST/lib/glibc-deb/lib64
+      - install -Dm755 usr/lib64/*.so.* $FLATPAK_DEST/cn.i4Tools/lib/
+    sources:
+      - type: file
+        url: https://mirrors.ustc.edu.cn/debian/pool/main/g/glibc/libc6-amd64_2.40-3_i386.deb 
+        sha256: f034bc39218b5678ace8fa991b672366e31fab2e0e19800a75e705f01fc19263
+        dest-filename: libc6-amd64_i386.deb 
+
+  - name: libsqlite3-deb
+    buildsystem: simple
+    build-commands:
+      - bsdtar --to-stdout -xf libsqlite3-0_3.46.1-1_amd64.deb data.* | bsdtar -xf -
       - install -Dm644 usr/lib/x86_64-linux-gnu/* -t $FLATPAK_DEST/lib/x86_64-linux-gnu
     sources:
       - type: file
-        url: http://ftp.cn.debian.org/debian/pool/main/libm/libmd/libmd0_1.1.0-2_amd64.deb
-        sha256: e6d2f7be9ad32d9acad95d01a42f3b451494229bd122d73767f5bbe818a057c5
-        dest-filename: libmd0_1.1.0-2_amd64.deb
+        url: https://mirrors.ustc.edu.cn/debian/pool/main/s/sqlite3/libsqlite3-0_3.46.1-1_amd64.deb
+        sha256: dbc22a2c055d1700d2a3e2a196ca7610678f8152891ca6caa21e7b629bdf3da5
+        dest-filename: libsqlite3-0_3.46.1-1_amd64.deb
+
+  - name: libmd0_1-deb
+    buildsystem: simple
+    build-commands:
+      - bsdtar --to-stdout -xf libmd0_1.1.0-2+b1_amd64.deb data.* | bsdtar -xf -
+      - install -Dm644 usr/lib/x86_64-linux-gnu/* -t $FLATPAK_DEST/lib/x86_64-linux-gnu
+    sources:
+      - type: file
+        url: http://ftp.cn.debian.org/debian/pool/main/libm/libmd/libmd0_1.1.0-2+b1_amd64.deb
+        sha256: 7244ec3839b61fac0c1884fe08aaa040f26e8f1f35f1f5d3482eacefd30d1b44
+        dest-filename: libmd0_1.1.0-2+b1_amd64.deb
   
   - name: libtinfo6-udeb_6.2+20201114-deb
     buildsystem: simple
@@ -450,13 +475,13 @@ modules:
   - name: libgnutls30_3.7.1-5+deb11u4_amd64-deb
     buildsystem: simple
     build-commands:
-      - bsdtar --to-stdout -xf libgnutls30_3.7.1-5+deb11u4_amd64.deb data.* | bsdtar -xf -
+      - bsdtar --to-stdout -xf libgnutls30_3.7.1-5+deb11u5_amd64.deb data.* | bsdtar -xf -
       - install -Dm644 usr/lib/x86_64-linux-gnu/* -t $FLATPAK_DEST/lib/x86_64-linux-gnu
     sources:
       - type: file
-        url: http://ftp.cn.debian.org/debian/pool/main/g/gnutls28/libgnutls30_3.7.1-5+deb11u4_amd64.deb
-        sha256: b2fa128881a16c2196caddb551d3577baa296a7bc5d38109a978e8e69fdb5c94
-        dest-filename: libgnutls30_3.7.1-5+deb11u4_amd64.deb
+        url: http://ftp.cn.debian.org/debian/pool/main/g/gnutls28/libgnutls30_3.7.1-5+deb11u5_amd64.deb
+        sha256: cdfacece6f69c9eeecd509c7c44e1d5b47e09ad5e48f732ae151ded1afce45b4
+        dest-filename: libgnutls30_3.7.1-5+deb11u5_amd64.deb
   
   - name: libunistring2_0.9.10-4_amd64-deb
     buildsystem: simple
