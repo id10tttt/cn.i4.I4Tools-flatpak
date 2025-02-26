@@ -76,8 +76,8 @@ modules:
       - -Dudevrulesdir=$FLATPAK_DEST/etc/udev/rules.d
     sources:
       - type: file
-        url: https://d-updater.i4.cn/i4linux/deb/i4tools_v3.06.007.deb
-        sha256: 5cd0fe060d008319c3538e867262e77920d14f918f9834fa864442d1dec5bd5f
+        url: https://d-updater.i4.cn/i4linux/deb/i4tools_v3.07.001.deb
+        sha256: d108eecf43d58d63fcfd3cd24471b6f66eabbad4ba110b11dbff573574c73f01
         dest-filename: i4tools.deb
       
   - name: i4tools
@@ -130,6 +130,6 @@ modules:
       - install -Dm755 usr/lib64/*.so.* $FLATPAK_DEST/cn.i4Tools/lib/
     sources:
       - type: file
-        url: https://mirrors.ustc.edu.cn/debian/pool/main/g/glibc/libc6-amd64_2.40-3_i386.deb 
-        sha256: f034bc39218b5678ace8fa991b672366e31fab2e0e19800a75e705f01fc19263
+        url: https://mirrors.ustc.edu.cn/debian/pool/main/g/glibc/libc6-amd64_2.40-7_i386.deb 
+        sha256: b604fad076eee79f88ad1a86d4b994749c21db741ea6d846d503774ad78c3f1b
         dest-filename: libc6-amd64_i386.deb 
