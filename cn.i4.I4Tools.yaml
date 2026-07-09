@@ -134,6 +134,6 @@ modules:
       - install -Dm755 usr/lib64/*.so.* $FLATPAK_DEST/cn.i4Tools/lib/
     sources:
       - type: file
-        url: https://mirrors.ustc.edu.cn/debian/pool/main/g/glibc/libc6-amd64_2.42-2_i386.deb
-        sha256: d78904b4331ca5fb84db9bdb4d407f6518f623b7b80a6708c42f7bd684406618
+        url: https://mirrors.ustc.edu.cn/debian/pool/main/g/glibc/libc6-amd64_2.42-17_i386.deb
+        sha256: 205e98d5e1f156b9f71986142bf4217633c37a7303c775843c7c9ea3f9c24980
         dest-filename: libc6-amd64_i386.deb 
