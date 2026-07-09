@@ -76,8 +76,8 @@ modules:
       - -Dudevrulesdir=$FLATPAK_DEST/etc/udev/rules.d
     sources:
       - type: file
-        url: http://d.updater.i4.cn/i4linux/deb/i4tools_v3.09.001.deb
-        sha256: f0d65c2f4f3a6184bd141e1af140c8c86dead529128c34dfdb7f3dec70f43b4a
+        url: https://d-updater.i4.cn/i4tools9/download/linux/x64/cn.i4Tools_9.01.003_amd64.deb
+        sha256: aec5ceff17c09bb6ac8741684198702f451c0de14c7bbc250d42b7527bc8fa03
         dest-filename: i4tools.deb
       
   - name: i4tools
